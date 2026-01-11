@@ -24,17 +24,14 @@ class SettingsFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentSettingsBinding
     private val viewModel by activityViewModels<QuoteViewModel>()
 
-    // تجهيز كود طلب الإذن (للأندرويد 13+)
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // لو وافق على الإذن، نفتح السويتش ونحفظ
             binding.switchNotifications.isChecked = true
             viewModel.saveSetting(Preference.ASK_NOTIF_PERM, true)
             Toast.makeText(context, "Notifications Enabled ✅", Toast.LENGTH_SHORT).show()
         } else {
-            // لو رفض، نقفل السويتش
             binding.switchNotifications.isChecked = false
             viewModel.saveSetting(Preference.ASK_NOTIF_PERM, false)
             Toast.makeText(context, "Notifications Disabled ❌", Toast.LENGTH_SHORT).show()
@@ -53,35 +50,27 @@ class SettingsFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- 1. Notifications Switch Logic ---
-        // بنشوف الحالة المحفوظة ونظبط السويتش عليها
         val isNotifEnabled = viewModel.getSetting(Preference.ASK_NOTIF_PERM)
         binding.switchNotifications.isChecked = isNotifEnabled
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                // لو شغل السويتش، نتأكد من الإذن الأول
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) ==
                         PackageManager.PERMISSION_GRANTED
                     ) {
                         viewModel.saveSetting(Preference.ASK_NOTIF_PERM, true)
                     } else {
-                        // نطلب الإذن
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
                 } else {
-                    // للأجهزة القديمة بيشتغل علطول
                     viewModel.saveSetting(Preference.ASK_NOTIF_PERM, true)
                 }
             } else {
-                // لو قفل السويتش
                 viewModel.saveSetting(Preference.ASK_NOTIF_PERM, false)
             }
         }
 
-
-        // --- 2. Dark Mode Logic ---
         val isDark = viewModel.getSetting(Preference.IS_DARK_MODE)
         binding.switchDarkMode.isChecked = isDark
 
@@ -91,7 +80,6 @@ class SettingsFragment : BottomSheetDialogFragment() {
         }
 
 
-        // --- 3. Language Logic ---
         val currentLang = viewModel.getSetting(Preference.APP_LANGUAGE)
         if (currentLang == "ar") binding.toggleLanguage.check(R.id.btnArabic)
         else binding.toggleLanguage.check(R.id.btnEnglish)
@@ -101,7 +89,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 val langCode = if (checkedId == R.id.btnArabic) "ar" else "en"
                 viewModel.saveSetting(Preference.APP_LANGUAGE, langCode)
                 updateLanguage(langCode)
-                dismiss() // نقفل القائمة عشان التطبيق يعمل ريستارت للغة
+                dismiss()
             }
         }
     }

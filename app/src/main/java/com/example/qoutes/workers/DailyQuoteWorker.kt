@@ -10,7 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.work.CoroutineWorker // استخدمنا CoroutineWorker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.qoutes.R
 import com.example.qoutes.repository.QuoteRepository
@@ -20,7 +20,6 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
-// غيرنا Worker لـ CoroutineWorker
 class DailyQuoteWorker(
     private val context: Context,
     params: WorkerParameters
@@ -32,28 +31,22 @@ class DailyQuoteWorker(
         fun getRepository(): QuoteRepository
     }
 
-    // الحقن اليدوي عشان Hilt مع Worker
     private val injector = EntryPoints.get(context, Injector::class.java)
     private val quoteRepository = injector.getRepository()
 
-    // الدالة بقت suspend عشان تشتغل في الخلفية صح
     override suspend fun doWork(): Result {
 
-        // 1. التأكد من إذن الإشعارات (للأندرويد 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            // لو مفيش إذن، منقدرش نبعت إشعار، فننهي المهمة بفشل
             return Result.failure()
         }
 
         return try {
-            // 2. نجيب اقتباس عشوائي من الداتا بيز المحلية (Offline First)
             val randomQuote = quoteRepository.getRandomQuoteForNotification()
 
             if (randomQuote != null) {
-                // 3. نجهز الضغطة على الإشعار تفتح التطبيق
                 val notificationIntent = Intent(context, QuotesActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 }
@@ -65,14 +58,13 @@ class DailyQuoteWorker(
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
-                // 4. بناء الإشعار
                 val builder = NotificationCompat.Builder(
                     context,
                     context.getString(R.string.daily_notif_id)
                 )
-                    .setSmallIcon(R.drawable.ic_motivation) // تأكد إن الأيقونة دي موجودة
+                    .setSmallIcon(R.drawable.ic_motivation)
                     .setContentTitle(context.getString(R.string.notif_title))
-                    .setContentText(randomQuote.quote) // نص الاقتباس
+                    .setContentText(randomQuote.quote)
                     .setStyle(
                         NotificationCompat.BigTextStyle()
                             .bigText("${randomQuote.quote}\n\n- ${randomQuote.author}")
@@ -82,14 +74,12 @@ class DailyQuoteWorker(
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setAutoCancel(true)
 
-                // 5. إرسال الإشعار
+
                 val managerCompat = NotificationManagerCompat.from(context)
-                // تأكدنا من الإذن فوق، فالتحذير ده ممكن نتجاهله هنا
                 managerCompat.notify(1, builder.build())
 
                 Result.success()
             } else {
-                // لو الداتا بيز فاضية
                 Result.failure()
             }
         } catch (e: Exception) {

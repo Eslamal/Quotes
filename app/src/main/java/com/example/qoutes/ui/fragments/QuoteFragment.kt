@@ -33,9 +33,8 @@ import kotlin.math.min
 @AndroidEntryPoint
 class QuoteFragment : Fragment() {
 
-    // variables
     private val viewModel by activityViewModels<QuoteViewModel>()
-    private val args: QuoteFragmentArgs by navArgs() // استلام البيانات (اسم القسم)
+    private val args: QuoteFragmentArgs by navArgs()
 
     private var quote: Quote? = null
     private var quoteShown = false
@@ -55,7 +54,6 @@ class QuoteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. استلام اسم القسم وتحميل الداتا الخاصة به
         val categoryId = args.categoryId
         viewModel.loadQuotesForCategory(categoryId)
 
@@ -115,7 +113,6 @@ class QuoteFragment : Fragment() {
             )
         }
 
-        // متغير لحساب مسافة السحب
         var dX = 0f
         var initialX = 0f
 
@@ -124,57 +121,46 @@ class QuoteFragment : Fragment() {
                 MotionEvent.ACTION_DOWN -> {
                     initialX = view.x
                     dX = view.x - event.rawX
-                    // نلغي الأنيميشن القديم لو موجود
                     view.animate().cancel()
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val newX = event.rawX + dX
-                    // نسمح بالسحب للشمال بس (عشان يجيب التالي)
-                    // لو عايز اليمين كمان شيل الشرط if (newX < initialX)
                     if (newX < initialX) {
                         view.animate()
                             .x(newX)
                             .setDuration(0)
                             .start()
 
-                        // تحديث النص حسب المسافة
-                        // استخدمنا Constants.MIN_SWIPE_DISTANCE (تأكد إنها مثلا -300 مش -200 عشان تكون أصعب شوية فمتسحبش غلط)
                         if (view.x < MIN_SWIPE_DISTANCE) {
-                            binding.extraText.text = getString(R.string.release_hint) // "اترك للتحميل"
-                            binding.extraText.setTextColor(ContextCompat.getColor(requireContext(), R.color.teal_200)) // لون مميز عند الاستعداد
+                            binding.extraText.text = getString(R.string.release_hint)
+                            binding.extraText.setTextColor(ContextCompat.getColor(requireContext(), R.color.teal_200))
                         } else {
-                            binding.extraText.text = getString(R.string.swipe_hint) // "اسحب للمزيد"
+                            binding.extraText.text = getString(R.string.swipe_hint)
                             binding.extraText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
                         }
                     }
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    // لو السحبة قوية كفاية
                     if (view.x < MIN_SWIPE_DISTANCE) {
-                        // أنيميشن الخروج الكامل
                         view.animate()
-                            .x(-view.width.toFloat()) // يخرج برا الشاشة خالص
+                            .x(-view.width.toFloat())
                             .setDuration(200)
                             .setListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
-                                    // تحميل الاقتباس الجديد
                                     viewModel.showRandomQuoteFromList()
 
-                                    // إرجاع الكارت لمكانه الأصلي بدون أنيميشن (عشان يظهر الجديد)
                                     view.x = initialX
-                                    view.animate().setListener(null) // إزالة الليسنر عشان مايتكررش
+                                    view.animate().setListener(null)
 
-                                    // رجع النص لأصله
                                     binding.extraText.text = getString(R.string.swipe_hint)
                                 }
                             }).start()
                     } else {
-                        // لو السحبة ضعيفة، رجعه مكانه (Bounce back)
                         view.animate()
                             .x(initialX)
-                            .setDuration(300) // أبطأ شوية عشان تدي شعور بالمرونة
+                            .setDuration(300)
                             .start()
                         binding.extraText.text = getString(R.string.swipe_hint)
                     }
@@ -219,7 +205,6 @@ class QuoteFragment : Fragment() {
         }
     }
 
-    // دوال التحكم في الظهور والاختفاء
     private fun showProgressBar() {
         binding.quoteLoading.visibility = View.VISIBLE
         hideTextViews()
@@ -228,7 +213,7 @@ class QuoteFragment : Fragment() {
     private fun showTextViews() {
         with(binding) {
             quoteTv.visibility = View.VISIBLE
-            authorTv.visibility = View.VISIBLE // <-- السطر ده كان ناقص
+            authorTv.visibility = View.VISIBLE
             authorTvShareBtnParent.visibility = View.VISIBLE
         }
     }

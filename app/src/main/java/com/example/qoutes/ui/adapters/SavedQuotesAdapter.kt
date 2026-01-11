@@ -16,7 +16,6 @@ class SavedQuotesAdapter : RecyclerView.Adapter<SavedQuotesAdapter.QuoteViewHold
 
     inner class QuoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    // differ callback that checks if elements are same of not
     private val differCallback = object : DiffUtil.ItemCallback<Quote>() {
         override fun areItemsTheSame(oldItem: Quote, newItem: Quote): Boolean {
             return oldItem.id == newItem.id
@@ -30,7 +29,6 @@ class SavedQuotesAdapter : RecyclerView.Adapter<SavedQuotesAdapter.QuoteViewHold
     val differ = AsyncListDiffer(this, differCallback)
     private lateinit var binding: QuoteItemBinding
 
-    // inflate layout
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
         binding = QuoteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return QuoteViewHolder(binding.root)
@@ -40,7 +38,6 @@ class SavedQuotesAdapter : RecyclerView.Adapter<SavedQuotesAdapter.QuoteViewHold
         return differ.currentList.size
     }
 
-    // Custom item onLongClick listener
     private var onItemLongClickListener: ((Quote) -> Boolean)? = null
 
     override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {

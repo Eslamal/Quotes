@@ -17,11 +17,6 @@ data class Quote(
 
     @SerializedName("h")
     val formatted: String = "",
-
-    // ده الحقل الجديد اللي هنستخدمه لتصنيف الاقتباس
-    // القيم هتكون مثلا: "prayers", "wisdom", "motivation"
     val category: String = "general",
-
-    // ضيف السطر ده ضروري عشان شاشة المفضلة
     var isBookmarked: Boolean = false
 )

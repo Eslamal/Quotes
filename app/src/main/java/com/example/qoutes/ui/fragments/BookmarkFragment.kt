@@ -24,8 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class BookmarkFragment : Fragment() {
 
-    // variables
-    private val viewModel by activityViewModels<QuoteViewModel>() // getting viewModel linked to activity
+    private val viewModel by activityViewModels<QuoteViewModel>()
     lateinit var savedQuotesAdapter: SavedQuotesAdapter
     private lateinit var binding: FragmentBookmarksBinding
 
@@ -43,7 +42,6 @@ class BookmarkFragment : Fragment() {
 
         setupRecyclerView()
 
-        // copy quote when the item is long clicked
         savedQuotesAdapter.setOnItemLongClickListener {
             val clipBoardManager = (activity as QuotesActivity)
                 .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -63,7 +61,6 @@ class BookmarkFragment : Fragment() {
             true
         }
 
-        // callback which defines what should be done when items are swiped
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -76,14 +73,12 @@ class BookmarkFragment : Fragment() {
                 return true
             }
 
-            // delete the quote on Swipe
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val quote = savedQuotesAdapter.differ.currentList[position]
                 viewModel.deleteQuote(quote)
                 Snackbar.make(view, "Removed Bookmark!", Snackbar.LENGTH_SHORT)
                     .apply {
-                        // if the click was in error, then provide re-saving option
                         setAction("Undo") {
                             viewModel.saveQuote(quote)
                             if ((activity as QuotesActivity?) != null && !(activity as QuotesActivity).atHome) Snackbar.make(
@@ -98,7 +93,6 @@ class BookmarkFragment : Fragment() {
             }
         }
 
-        // attach the swipe behavior to each recycler view item
         ItemTouchHelper(itemTouchHelperCallback).apply {
             attachToRecyclerView(binding.rvSavedQuotes)
         }
@@ -106,7 +100,6 @@ class BookmarkFragment : Fragment() {
         viewModel.getSavedQuotes().observe(viewLifecycleOwner) { articles ->
             savedQuotesAdapter.differ.submitList(articles)
 
-            // if no quotes present, then show textview and hide recyclerview
             if (articles.isEmpty()) {
                 binding.rvSavedQuotes.visibility = View.GONE
                 binding.tvNoBookmarks.visibility = View.VISIBLE
@@ -117,7 +110,6 @@ class BookmarkFragment : Fragment() {
         }
     }
 
-    // function to set adapter and layout manager on the recycler view
     private fun setupRecyclerView() {
         savedQuotesAdapter = SavedQuotesAdapter()
         binding.rvSavedQuotes.apply {

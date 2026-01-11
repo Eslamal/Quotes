@@ -20,20 +20,18 @@ class JsonDataLoader @Inject constructor(
 ) {
 
     private val jsonFiles = listOf(
-        "prayers.json",     // أدعية
-        "wisdom.json",      // حكم
-        "proverbs.json",    // أمثال (جديد)
-        "books.json",       // كتب (جديد)
-        "motivation.json",  // تحفيز
-        "success.json",     // نجاح (جديد)
-        "stoicism.json",    // رواقية (جديد)
-        "technology.json"   // تكنولوجيا (جديد)
+        "prayers.json",
+        "wisdom.json",
+        "proverbs.json",
+        "books.json",
+        "motivation.json",
+        "success.json",
+        "stoicism.json",
+        "technology.json"
     )
 
     fun loadDataIfNeeded() {
         CoroutineScope(Dispatchers.IO).launch {
-            // بنستخدم مفتاح في الإعدادات عشان نتأكد إننا مش بنحمل الداتا كل مرة نفتح التطبيق
-            // لو عايز تعمل تحديث للداتا ممكن تغير اسم المفتاح ده لـ data_loaded_v2 مثلا
             val isLoaded = preferenceStore.getPreference(Preference(androidx.datastore.preferences.core.booleanPreferencesKey("data_loaded_v1"), false))
 
             if (!isLoaded) {
@@ -46,7 +44,6 @@ class JsonDataLoader @Inject constructor(
                         val listType = object : TypeToken<List<Quote>>() {}.type
                         val quotes: List<Quote> = gson.fromJson(jsonString, listType)
 
-                        // بنتأكد إن التصنيف (category) مظبوط، ولو مش موجود في الملف بناخده من اسم الملف
                         val categoryName = fileName.replace(".json", "")
 
                         val quotesWithCategory = quotes.map { it.copy(category = it.category.ifEmpty { categoryName }, isBookmarked = false) }
@@ -55,7 +52,6 @@ class JsonDataLoader @Inject constructor(
 
                     if (allQuotes.isNotEmpty()) {
                         quoteDao.insertAll(allQuotes)
-                        // نعلم إن التحميل تم بنجاح
                         preferenceStore.putPreference(Preference(androidx.datastore.preferences.core.booleanPreferencesKey("data_loaded_v1"), true), true)
                     }
 

@@ -15,17 +15,14 @@ import javax.inject.Inject
 @HiltAndroidApp
 class QuotesApplication : Application() {
 
-    // حقن كلاس تحميل البيانات
     @Inject
     lateinit var dataLoader: JsonDataLoader
 
     override fun onCreate() {
         super.onCreate()
 
-        // 1. تشغيل عملية تحميل البيانات من ملفات JSON عند فتح التطبيق
         dataLoader.loadDataIfNeeded()
 
-        // 2. إعداد قنوات الإشعارات (للأندرويد 8+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager: NotificationManager =
                 this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -41,7 +38,6 @@ class QuotesApplication : Application() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // 3. إعداد الـ Worker للإشعارات اليومية
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()

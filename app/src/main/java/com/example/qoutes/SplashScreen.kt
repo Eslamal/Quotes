@@ -16,18 +16,12 @@ class SplashScreen : AppCompatActivity() {
         binding = ActivitySplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // --- هنا السر: التحكم في السرعة ---
-        // 1.0f = السرعة العادية
-        // 1.5f = أسرع مرة ونص
-        // 2.0f = أسرع مرتين (الضعف)
-        binding.lottieView.speed = 2.0f // جرب الرقم ده هيعجبك
+        binding.lottieView.speed = 2.0f
 
-        // التحكم في الأنيميشن
         binding.lottieView.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator) {}
 
             override fun onAnimationEnd(animation: Animator) {
-                // أول ما يخلص (بالسرعة الجديدة) ينقل
                 goToHome()
             }
 

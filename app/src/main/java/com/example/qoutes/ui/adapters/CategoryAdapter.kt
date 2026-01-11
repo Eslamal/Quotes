@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.qoutes.databinding.ItemCategoryBinding
 import com.example.qoutes.R
 
-// مودل بسيط للأقسام
+
 data class Category(
-    val id: String,        // المفتاح اللي هنستخدمه في الفلترة (زي prayers, wisdom)
-    val name: String,      // الاسم اللي هيظهر للمستخدم
-    val color: Int,        // لون الكارت
-    val icon: Int          // أيقونة الكارت
+    val id: String,
+    val name: String,
+    val color: Int,
+    val icon: Int
 )
 
 class CategoryAdapter(

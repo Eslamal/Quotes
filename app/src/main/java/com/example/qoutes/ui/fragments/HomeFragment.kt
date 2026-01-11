@@ -27,10 +27,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // تجهيز قائمة الأقسام
-        // ملاحظة: الألوان دي (R.color.xxx) لازم تكون موجودة أو تستخدم ألوان مؤقتة
         val categories = listOf(
-            // لاحظ استخدام getString عشان يجيب الاسم حسب لغة الموبايل
             Category("prayers", getString(R.string.cat_prayers), R.color.purple_500, R.drawable.ic_prayers),
             Category("wisdom", getString(R.string.cat_wisdom), R.color.teal_700, R.drawable.ic_wisdom),
             Category("proverbs", getString(R.string.cat_proverbs), R.color.deep_blue, R.drawable.ic_proverbs),
@@ -43,8 +40,6 @@ class HomeFragment : Fragment() {
         )
 
         val adapter = CategoryAdapter(categories) { selectedCategory ->
-            // هنا الكود اللي بينقل لصفحة الاقتباسات
-            // لسه هنظبط الـ Navigation Graph عشان يستقبل الـ category
             val action = HomeFragmentDirections.actionHomeFragmentToQuoteFragment(selectedCategory.id)
             findNavController().navigate(action)
         }

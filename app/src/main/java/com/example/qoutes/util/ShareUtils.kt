@@ -23,7 +23,6 @@ object ShareUtils {
         )
         val uri = Uri.parse(bmpPath)
 
-        // Sharing
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "image/jpg"
 

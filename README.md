@@ -1,6 +1,6 @@
 # ❝ Quotes App
 
-[![Download on Uptodown](https://img.shields.io/badge/Download_on-Uptodown-0080FF?style=for-the-badge&logo=android&logoColor=white)]([https://com-eslam-quotesapp.uptodown.com/android])
+[![Download on Uptodown](https://img.shields.io/badge/Download_on-Uptodown-0080FF?style=for-the-badge&logo=android&logoColor=white)](https://com-eslam-quotesapp.uptodown.com/android)
 
 A modern, feature-rich Android application designed to provide daily inspiration through a vast collection of quotes. Built using **Modern Android Development (MAD)** practices, this app demonstrates a clean architecture, robust offline capabilities, and a polished user interface.
 

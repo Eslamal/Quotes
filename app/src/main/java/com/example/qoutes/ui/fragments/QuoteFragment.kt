@@ -3,8 +3,10 @@ package com.example.qoutes.ui.fragments
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -28,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.min
 
 @AndroidEntryPoint
 class QuoteFragment : Fragment() {
@@ -170,16 +171,25 @@ class QuoteFragment : Fragment() {
             }
         }
 
+        binding.quoteTv.setOnClickListener {
+            quote?.let { currentQuote ->
+                val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("quote", "\"${currentQuote.quote}\"\n\n- ${currentQuote.author}")
+                clipboard.setPrimaryClip(clip)
+                makeSnackBar(view, "Quote Copied to Clipboard!")
+            }
+        }
+
         binding.fab.setOnClickListener {
             if (isBookMarked) {
                 viewModel.deleteQuote(quote!!)
-                if ((activity as QuotesActivity).atHome) Snackbar.make(
+                if ((requireActivity() as QuotesActivity).atHome) Snackbar.make(
                     requireActivity().findViewById(R.id.quotesNavHostFragment),
                     "Removed Bookmark!", Snackbar.LENGTH_SHORT
                 ).apply {
                     setAction("Undo") {
                         viewModel.saveQuote(quote!!)
-                        if ((activity as QuotesActivity).atHome) makeSnackBar(view, "Re-saved!")
+                        if ((requireActivity() as QuotesActivity).atHome) makeSnackBar(view, "Re-saved!")
                     }
                     setActionTextColor(ContextCompat.getColor(view.context, R.color.light_blue))
                     show()
@@ -200,7 +210,7 @@ class QuoteFragment : Fragment() {
 
         binding.quoteShare.setOnClickListener {
             binding.quoteShare.visibility = View.GONE
-            ShareUtils.share(binding.cardHolder, activity as QuotesActivity)
+            ShareUtils.share(binding.cardHolder, requireContext())
             binding.quoteShare.visibility = View.VISIBLE
         }
     }
@@ -231,7 +241,7 @@ class QuoteFragment : Fragment() {
     }
 
     private fun makeSnackBar(view: View, message: String) {
-        if ((activity as QuotesActivity).atHome) {
+        if ((requireActivity() as QuotesActivity).atHome) {
             Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
             if (binding.fab.visibility == View.VISIBLE) {
                 binding.fab.visibility = View.INVISIBLE

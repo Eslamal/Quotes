@@ -32,7 +32,12 @@ class JsonDataLoader @Inject constructor(
 
     fun loadDataIfNeeded() {
         CoroutineScope(Dispatchers.IO).launch {
-            val isLoaded = preferenceStore.getPreference(Preference(androidx.datastore.preferences.core.booleanPreferencesKey("data_loaded_v1"), false))
+            val isLoaded = preferenceStore.getPreference(
+                Preference(
+                    androidx.datastore.preferences.core.booleanPreferencesKey("data_loaded_v1"),
+                    false
+                )
+            )
 
             if (!isLoaded) {
                 try {
@@ -40,19 +45,31 @@ class JsonDataLoader @Inject constructor(
                     val allQuotes = mutableListOf<Quote>()
 
                     jsonFiles.forEach { fileName ->
-                        val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+                        val jsonString =
+                            context.assets.open(fileName).bufferedReader().use { it.readText() }
                         val listType = object : TypeToken<List<Quote>>() {}.type
                         val quotes: List<Quote> = gson.fromJson(jsonString, listType)
 
                         val categoryName = fileName.replace(".json", "")
 
-                        val quotesWithCategory = quotes.map { it.copy(category = it.category.ifEmpty { categoryName }, isBookmarked = false) }
+                        val quotesWithCategory = quotes.map {
+                            it.copy(
+                                category = it.category.ifEmpty { categoryName },
+                                isBookmarked = false
+                            )
+                        }
                         allQuotes.addAll(quotesWithCategory)
                     }
 
                     if (allQuotes.isNotEmpty()) {
                         quoteDao.insertAll(allQuotes)
-                        preferenceStore.putPreference(Preference(androidx.datastore.preferences.core.booleanPreferencesKey("data_loaded_v1"), true), true)
+                        preferenceStore.putPreference(
+                            Preference(
+                                androidx.datastore.preferences.core.booleanPreferencesKey(
+                                    "data_loaded_v1"
+                                ), true
+                            ), true
+                        )
                     }
 
                 } catch (e: Exception) {
